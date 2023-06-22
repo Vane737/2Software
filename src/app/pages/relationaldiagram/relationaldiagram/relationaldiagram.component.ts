@@ -136,39 +136,40 @@ export class RelationaldiagramComponent {
 
   public expandMode: ExpandMode = 'Multiple';
 
-  private nodes: NodeModel[] = [
-    //{ id: 'Class', shape: { type: 'UmlClassifier', shape: 'Class' }  as UmlClassifierShapeModel },
+  public nodes: NodeModel[] = [
     {
-      id: "Patient",
-      //Position of the node
-      offsetX: 200,
-      offsetY: 200,
+      id: 'NameClass',
       shape: {
-        type: "UmlClassifier",
-        //Define class object
-        class: {
-          name: "Patient",
-          //Define class attributes
-          attributes: [{ name: "accepted", type: "Date" }],
-          //Define class methods
-          methods: [{ name: "getHistory", type: "getHistory" }]
+        type: 'UmlClassifier',
+        classShape: {
+          name: 'NameClass',
+          attributes: [
+            this.createProperty('atributo', 'type'),
+          ],
+          methods: [this.createMethods('metodo', 'void')]
         },
-        classifier: "Class"
-      } as UmlClassifierShapeModel
+        classifier: 'Class'
+      } as UmlClassifierShapeModel,
+      offsetX: -900,
+      offsetY: -750
     }
-    // { id: 'Aggregation', shape: { type: 'UmlClassifier',  class: {"Class"}, classifier: }  as UmlClassifierShapeModel},
-    //{ id: 'Activity', shape: { type: 'UmlClassifier', shape: 'Activity' }},
-
 
   ];
+
+
+
+
+    // create class Methods
+    public createMethods(name: string, type: string): object {
+      return { name: name, type: type };
+    }
 
   public createProperty(name: string, type: string): object {
     return { name: name, type: type };
   }
 
   public palettes: PaletteModel[] = [
-    { id: 'UmlClassifier', symbols: this.nodes, title: 'UML Shapes' },
-    { id: 'Connector', expanded: true, symbols: this.connectorSymbols, title: 'Connectors' },
+    { id: 'Conectores', expanded: true, symbols: this.connectorSymbols, title: 'Connectors' },
 ];
 
   public getSymbolInfo(symbol: NodeModel): SymbolInfo {
