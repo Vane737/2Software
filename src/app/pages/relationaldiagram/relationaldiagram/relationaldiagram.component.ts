@@ -142,7 +142,7 @@ export class RelationaldiagramComponent {
       shape: {
         type: 'UmlClassifier',
         classShape: {
-          name: 'NameClass',
+          name: '',
           attributes: [
             this.createProperty('atributo', 'type'),
           ],
@@ -151,7 +151,7 @@ export class RelationaldiagramComponent {
         classifier: 'Class'
       } as UmlClassifierShapeModel,
       offsetX: -900,
-      offsetY: -750
+      offsetY: -700
     }
 
   ];
