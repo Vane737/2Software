@@ -1,8 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Diagram, NodeModel, UndoRedo, ConnectorModel, PointPortModel, Connector,
   SymbolInfo, IDragEnterEventArgs, SnapSettingsModel, MarginModel,
   UmlClassifierShape, PaletteModel, DiagramComponent, DiagramContextMenuService, UmlClassifierShapeModel, PointModel, DecoratorModel, StrokeStyleModel, multiplyMatrix, MultiplicityLabel  } from '@syncfusion/ej2-angular-diagrams';
 import { ExpandMode } from '@syncfusion/ej2-navigations';
+import { Observable } from 'rxjs';
 //import { UmlCassifierShape } from '@syncfusion/ej2-angular-diagrams';
 Diagram.Inject(UndoRedo);
 
@@ -11,15 +12,35 @@ Diagram.Inject(UndoRedo);
   templateUrl: './relationaldiagram.component.html',
   styleUrls: ['./relationaldiagram.component.css']
 })
-export class RelationaldiagramComponent {
+export class RelationaldiagramComponent implements OnInit {
+
+  c = 0;
 
   @ViewChild('diagram')
   //Diagram Properties
   public diagram!: DiagramComponent;
 
-  public created(): void {
-    this.diagram.fitToPage();
+
+  nodes: NodeModel[] = []; // Lista de elementos
+  nodosObservable: Observable<NodeModel[]> | undefined; // Observador para rastrear los cambios
+
+
+  constructor(private cdRef: ChangeDetectorRef) {}
+  ngOnInit(): void {
+        // Inicializar el Observador
+        this.nodosObservable = new Observable<NodeModel[]>(observer => {
+          // Emitir los cambios en la lista de elementos
+          observer.next(this.nodes);
+        });
+
+        // Suscribirse al Observador y actualizar la vista cuando haya cambios
+        this.nodosObservable.subscribe(() => {
+          // Actualizar la vista
+          this.cdRef.detectChanges();
+        });
   }
+
+
 
   public interval: number[] = [
     1, 9, 0.25, 9.75, 0.25, 9.75, 0.25, 9.75, 0.25, 9.75, 0.25,
@@ -35,10 +56,19 @@ export class RelationaldiagramComponent {
   public dragEnter(args: IDragEnterEventArgs): void {
     let obj: NodeModel = args.element as NodeModel;
     if (obj && obj.width && obj.height) {
-
+      this.diagram.setNodeTemplate;
     }
   }
 
+  public addClass(): void {
+    this.nodes?.push( this.createNode("node" + this.c, 400, 300, ""));
+    this.diagram.add(this.createNode("node" + this.c, 400, 300, ""));
+    this.diagram.layout;
+    this.c++;
+    console.log(this.nodes);
+
+    console.log("Aqui aqui dx");
+  }
   // Paleta
 
   public getConnectorStyle(dashArrayed?: boolean) {
@@ -51,14 +81,13 @@ export class RelationaldiagramComponent {
     return style;
 }
 
-       // initializes connector symbols to the connector palette in the symbol palette
  //Initializes connector symbols for the symbol palette
  private connectorSymbols: ConnectorModel[] = [
   {
     id: 'Asociación',
     type: 'Straight',
-    sourcePoint: { x: 0, y: 0 },
-    targetPoint: { x: 60, y: 60 },
+    sourcePoint: { x: 100, y: 200 },
+    targetPoint: { x: 300, y: 200 },
     targetDecorator: { shape: 'Arrow', style: {strokeColor: '#757575', fill: '#757575'} },
     style: { strokeWidth: 1, strokeColor: '#757575' },
     shape: {
@@ -117,7 +146,7 @@ export class RelationaldiagramComponent {
       relationship: "Realization"
      }
   },
-  {
+/*  {
     id: 'Realización',
     type: 'Polyline',
     sourcePoint: { x: 0, y: 0 },
@@ -130,13 +159,14 @@ export class RelationaldiagramComponent {
       relationship: "Inheritance"
      }
   }
+*/
 ];
    //SymbolPalette Properties
   public symbolMargin: MarginModel = { left: 15, right: 15, top: 15, bottom: 15 };
 
   public expandMode: ExpandMode = 'Multiple';
 
-  public nodes: NodeModel[] = [
+/*  public nodese: NodeModel[] = [
     {
       id: 'NameClass',
       shape: {
@@ -155,18 +185,75 @@ export class RelationaldiagramComponent {
     }
 
   ];
+*/
+ // Set the default values of nodes.
+ public getNodeDefaults(obj: NodeModel): NodeModel {
+  obj.style = { fill: '#26A0DA', strokeColor: 'white' };
+  return obj;
+}
 
+public created(): void {
+  this.diagram.fitToPage();
+}
 
+// Set the default values of connectors.
+public getConnectorDefaults(connector: ConnectorModel): void {
+        connector.type = 'Polyline';
+        connector.style!.strokeColor = '#6f409f';
+        connector.style!.strokeWidth = 2;
+//        connector.targetDecorator = { style: { strokeColor: '#6f409f', fill: '#6f409f' } };
+};
 
-
-    // create class Methods
-    public createMethods(name: string, type: string): object {
-      return { name: name, type: type };
+// Set an annoation style at runtime.
+public setNodeTemplate(node: NodeModel): void {
+  if (node.annotations!.length > 0) {
+    for (let i: number = 0; i < node.annotations!.length; i++) {
+      node.annotations![i].style!.color = 'white';
     }
-
-  public createProperty(name: string, type: string): object {
-    return { name: name, type: type };
   }
+}
+
+// Create a connector.
+public createConnector( id: string, sourceID: string, targetID: string ): ConnectorModel {
+  let connector: ConnectorModel = {};
+  connector.id = id;
+  connector.sourceID = sourceID;
+  connector.targetID = targetID;
+  return connector;
+}
+
+// Create class Diagram shapes.
+public createNode(id: string, offsetX: number, offsetY: number, className: string): NodeModel {
+  let node: NodeModel = {};
+  node.id = id;
+  node.offsetX = offsetX;
+  node.offsetY = offsetY;
+  node.shape = {
+    type: 'UmlClassifier',
+    classShape: {
+      name: className,
+      attributes: [
+        this.createProperty('atributo', 'type'),
+      ],
+      methods: [this.createMethods('metodo', 'void')]
+    },
+    classifier: 'Class'
+  } as UmlClassifierShapeModel;
+  return node;
+}
+
+// create class Property
+public createProperty(name: string, type: string): object {
+  return { name: name, type: type };
+}
+
+// create class Methods
+public createMethods(name: string, type: string): object {
+  return { name: name, type: type };
+}
+
+
+
 
   public palettes: PaletteModel[] = [
     { id: 'Conectores', expanded: true, symbols: this.connectorSymbols, title: 'Connectors' },

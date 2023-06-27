@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { SymbolPaletteModule, DiagramModule, DiagramContextMenuService  } from '@syncfusion/ej2-angular-diagrams';
 import { RelationaldiagramComponent } from './pages/relationaldiagram/relationaldiagram/relationaldiagram.component';
 import { RoomComponent } from './pages/room/room/room.component';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { RoomComponent } from './pages/room/room/room.component';
     BrowserModule,
     AppRoutingModule,
     DiagramModule,
-    SymbolPaletteModule
+    SymbolPaletteModule,
+    ButtonModule
   ],
   providers: [DiagramContextMenuService],
   bootstrap: [AppComponent]
